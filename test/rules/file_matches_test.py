@@ -79,7 +79,7 @@ def test_execute_shouldReturnTrueIfTheFilesMatch(filecmpMock, pathExistsMock):
     pathExistsMock.return_value = True
     filecmpMock.return_value = True
 
-    fileMatchesRule = FileMatchesRule(testFolder, fileName, fixturePath)
+    fileMatchesRule = FileMatchesRule({}, testFolder, fileName, fixturePath)
     assert fileMatchesRule.execute(outputFolder)
     filecmpMock.assert_called_once_with(os.path.join(
         outputFolder, fileName), os.path.join(testFolder, fixturePath), shallow=False)
@@ -92,7 +92,7 @@ def test_execute_shouldReturnFalseIfTheFilesDoNotMatch(printMock, filecmpMock, p
     filecmpMock.return_value = False
     pathExistsMock.return_value = True
 
-    fileMatchesRule = FileMatchesRule(testFolder, fileName, fixturePath)
+    fileMatchesRule = FileMatchesRule({}, testFolder, fileName, fixturePath)
     fileMatchesRule.printDifferences = MagicMock(name='printDifferences')
     assert not fileMatchesRule.execute(outputFolder)
     printMock.assert_called_once_with(
@@ -105,7 +105,7 @@ def test_execute_shouldReturnFalseIfTheFilesDoNotMatch(printMock, filecmpMock, p
 def test_execute_shouldReturnFalseAndNotThrowIfFixtureDoesNotExist(printMock, filecmpMock, pathExistsMock):
     filecmpMock.side_effect = throwFixtureFileNotFound
     pathExistsMock.side_effect = fixtureFileDoesNotExist
-    fileMatchesRule = FileMatchesRule(testFolder, fileName, fixturePath)
+    fileMatchesRule = FileMatchesRule({}, testFolder, fileName, fixturePath)
 
     assert not fileMatchesRule.execute(outputFolder)
     printMock.assert_called_once_with("assertion fileMatches " + fileName+" "+fixturePath +
@@ -118,7 +118,7 @@ def test_execute_shouldReturnFalseAndNotThrowIfFixtureDoesNotExist(printMock, fi
 def test_execute_shouldReturnFalseAndNotThrowIfFileDoesNotExist(printMock, filecmpMock, pathExistsMock):
     filecmpMock.side_effect = throwGeneratedFileNotFound
     pathExistsMock.side_effect = fileNameDoesNotExist
-    fileMatchesRule = FileMatchesRule(testFolder, fileName, fixturePath)
+    fileMatchesRule = FileMatchesRule({}, testFolder, fileName, fixturePath)
 
     assert not fileMatchesRule.execute(outputFolder)
     printMock.assert_called_once_with("assertion fileMatches " + fileName+" "+fixturePath +
@@ -138,7 +138,7 @@ def test_printDifferencesPrintsFileDiff(echoMock, styleMock, diffMock, readLines
     diffMock.return_value = diffLines
     styleMock.side_effect = styleSideEffect
 
-    fileMatchesRule = FileMatchesRule(testFolder, fileName, fixturePath)
+    fileMatchesRule = FileMatchesRule({}, testFolder, fileName, fixturePath)
     fileMatchesRule.printDifferences(fileName, fixturePath)
 
     diffMock.assert_called_once_with(wrongOutputLines, fixtureFileLines, fromfile=fileName, tofile=fixturePath)
@@ -158,7 +158,7 @@ def test_printDifferencesPrintsFileDiff(echoMock, styleMock, diffMock, readLines
     diffMock.return_value = diffLines
     styleMock.side_effect = styleSideEffect
 
-    fileMatchesRule = FileMatchesRule(testFolder, fileName, fixturePath)
+    fileMatchesRule = FileMatchesRule({}, testFolder, fileName, fixturePath)
     fileMatchesRule.printDifferences(fileName, fixturePath)
 
     diffMock.assert_called_once_with(wrongOutputLines, fixtureFileLines, fromfile=fileName, tofile=fixturePath)
@@ -170,7 +170,7 @@ def test_printDifferencesPrintsFileDiff(echoMock, styleMock, diffMock, readLines
 def test_printDifferencesHandlesBinary(readLinesMock, printMock):
     readLinesMock.side_effect = UnicodeDecodeError('encoding', bytearray(1) , 0, 1, 'test error')
     
-    fileMatchesRule = FileMatchesRule(testFolder, fileName, fixturePath)
+    fileMatchesRule = FileMatchesRule({}, testFolder, fileName, fixturePath)
     fileMatchesRule.printDifferences(fileName, fixturePath)
 
     printMock.assert_called_once_with("One or both files are binary, unable to print differences")

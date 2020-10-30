@@ -33,10 +33,11 @@ import click
 
 class FileMatchesRule:
 
-    def __init__(self, testFolder, fileName, fixturePath):
+    def __init__(self, options, testFolder, fileName, fixturePath):
         self.fileName = fileName
         self.fixturePath = fixturePath
         self.testFolder = testFolder
+        self.options = options
 
     def execute(self, outputFolder):
         fixtureFile = os.path.join(self.testFolder, self.fixturePath)
@@ -71,13 +72,14 @@ class FileMatchesRule:
         return isinstance(obj, FileMatchesRule) \
             and obj.fileName == self.fileName \
             and obj.fixturePath == self.fixturePath \
-            and obj.testFolder == self.testFolder
+            and obj.testFolder == self.testFolder \
+            and obj.options == self.options
 
     def __ne__(self, obj):
         return not self == obj
 
     def __str__(self):
-        return "{0}: [testFolder={1}, fileName={2}, fixturePath={3}]".format(type(self).__name__, self.testFolder, self.fileName, self.fixturePath)
+        return "{0}: [testFolder={1}, fileName={2}, fixturePath={3}, options={4}]".format(type(self).__name__, self.testFolder, self.fileName, self.fixturePath, self.options)
 
     def __repr__(self):
         return self.__str__()

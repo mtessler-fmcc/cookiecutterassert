@@ -37,6 +37,26 @@ execute_test()
   fi
 }
 
+execute_test_expected_output()
+{
+  EXPECTED_RESULT=$1
+  shift;
+  FOLDER=$1
+  shift;
+  COMMAND=$@
+  echo $COMMAND
+  $COMMAND  > $FOLDER/actual-cookiecutterassert-output.txt
+  if [ $? != $EXPECTED_RESULT ] ; then
+    echo "INTEGRATION TEST FAILED!!!"
+    exit 1
+  fi
+  cmp $FOLDER/actual-cookiecutterassert-output.txt $FOLDER/expected-cookiecutterassert-output.txt
+  if [ $? != 0 ] ; then
+    echo "INTEGRATION TEST FAILED DUE TO INCORRECT COMMAND OUTPUT"
+    exit 1
+  fi
+}
+
 
 execute_test 0 pipenv run python runIntegrationTest.py --templatefolder ./integrationTests/basicIntegrationTest
 execute_test 1 pipenv run python runIntegrationTest.py --templatefolder ./integrationTests/failingIntegrationTest
@@ -50,5 +70,5 @@ execute_test 0 pipenv run python runIntegrationTest.py --templatefolder ./integr
 execute_test 1 pipenv run python runIntegrationTest.py --templatefolder ./integrationTests/binaryFileDiff
 execute_test 1 pipenv run python runIntegrationTest.py --templatefolder ./integrationTests/no-test-warning
 execute_test 1 pipenv run python runIntegrationTest.py --templatefolder ./integrationTests/no-test-cases-warning
-
+execute_test_expected_output 1 ./integrationTests/visible-spaces pipenv run python runIntegrationTest.py --templatefolder ./integrationTests/visible-spaces
 echo "All Integration Tests PASSED!!!!!"
