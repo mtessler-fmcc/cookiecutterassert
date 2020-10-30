@@ -31,6 +31,8 @@ from cookiecutterassert.rules import rules_util
 import difflib
 import click
 
+from cookiecutterassert.rules.option_names import VISIBLE_WHITESPACE
+
 class FileMatchesRule:
 
     def __init__(self, options, testFolder, fileName, fixturePath):
@@ -58,13 +60,17 @@ class FileMatchesRule:
         try:
             outputLines = rules_util.readLinesFromFile(outputFile)
             fixtureLines = rules_util.readLinesFromFile(fixtureFile)
+            i = 0
             for diffLine in difflib.unified_diff(outputLines, fixtureLines, fromfile=outputFile, tofile=fixtureFile):
+                if (i > 2):
+                    diffLine = self.getVisibleWhitespace(diffLine)
                 styledLine = diffLine
                 if (diffLine.startswith("+")):
                     styledLine = click.style(diffLine, fg='blue')
                 elif (diffLine.startswith("-")):
                     styledLine = click.style(diffLine, fg="yellow")
                 click.echo(styledLine)
+                i = i+1
         except UnicodeDecodeError:
             messager.printError("One or both files are binary, unable to print differences")
 
@@ -83,3 +89,9 @@ class FileMatchesRule:
 
     def __repr__(self):
         return self.__str__()
+    
+    def getVisibleWhitespace(self, diffLine):
+        if (VISIBLE_WHITESPACE in self.options and self.options[VISIBLE_WHITESPACE]):
+            return diffLine.replace(" ", "•")
+        else:
+            return diffLine

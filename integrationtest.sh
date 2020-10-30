@@ -31,8 +31,9 @@ execute_test()
   COMMAND=$@
   echo $COMMAND
   $COMMAND
-  if [ $? != $EXPECTED_RESULT ] ; then
-    echo "INTEGRATION TEST FAILED!!!"
+  ACTUAL_RESULT=$?
+  if [ $ACTUAL_RESULT != $EXPECTED_RESULT ] ; then
+    echo "INTEGRATION TEST FAILED!!! expecting result of $EXPECTED_RESULT but got $ACTUAL_RESULT"
     exit 1
   fi
 }
@@ -46,8 +47,9 @@ execute_test_expected_output()
   COMMAND=$@
   echo $COMMAND
   $COMMAND  > $FOLDER/actual-cookiecutterassert-output.txt
-  if [ $? != $EXPECTED_RESULT ] ; then
-    echo "INTEGRATION TEST FAILED!!!"
+  ACTUAL_RESULT=$?
+  if [ $ACTUAL_RESULT != $EXPECTED_RESULT ] ; then
+    echo "INTEGRATION TEST FAILED!!! expecting result of $EXPECTED_RESULT but got $ACTUAL_RESULT"
     exit 1
   fi
   cmp $FOLDER/actual-cookiecutterassert-output.txt $FOLDER/expected-cookiecutterassert-output.txt

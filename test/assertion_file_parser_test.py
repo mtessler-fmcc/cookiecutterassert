@@ -38,8 +38,10 @@ from cookiecutterassert.rules.file_contains_snippet_rule import FileContainsSnip
 from cookiecutterassert.rules.file_does_not_contain_snippet import FileDoesNotContainSnippetRule
 from cookiecutterassert import messager
 from unittest.mock import patch
+from cookiecutterassert.rules.option_names import VISIBLE_WHITESPACE
 
 import os.path
+
 
 def test_parseAssertionFile_shouldReturnAssertionRuleArray():
     currentFolder = os.path.dirname(os.path.abspath(__file__))
@@ -88,7 +90,7 @@ def test_parseAssertionFile_shouldReturnAssertionRuleArray():
     currentFolder = os.path.dirname(os.path.abspath(__file__))
     testFolder = Path(currentFolder).parent.joinpath("example")
     assertionFile = testFolder.joinpath("sampleAssertionFileWithVisibleWhitespace.yaml")
-    options = {'visible-whitespace':True}
+    options = {VISIBLE_WHITESPACE : True}
 
     expectedRules = []
     expectedRules.append(PathExistsRule(options, str(testFolder), "foo.txt"))

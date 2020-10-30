@@ -29,6 +29,7 @@ from unittest.mock import patch, MagicMock
 from cookiecutterassert.rules import rules_util
 import filecmp
 import os.path
+from cookiecutterassert.rules.option_names import VISIBLE_WHITESPACE
 
 fileName = "some/test/file"
 fixturePath = "fixture"
@@ -174,3 +175,42 @@ def test_printDifferencesHandlesBinary(readLinesMock, printMock):
     fileMatchesRule.printDifferences(fileName, fixturePath)
 
     printMock.assert_called_once_with("One or both files are binary, unable to print differences")
+
+@patch("cookiecutterassert.rules.rules_util.readLinesFromFile")
+@patch("difflib.unified_diff")
+@patch("click.style")
+@patch("click.echo")
+def test_printDifferencesPrintsFileDiffWithVisibleWhitepsace(echoMock, styleMock, diffMock, readLinesMock):
+    readLinesMock.side_effect = readLinesSideEffect
+    diffLines = [
+        "--- integrationTests/visible-spaces/test/spaces/build/MyApp/file-with-spaces",
+        "+++ integrationTests/visible-spaces/test/spaces/expected-file-with-spaces",
+        "@@ -1,3 +1,3 @@",
+        " line with spaces",
+        "-foo is bar",
+        "+ foo  is  bar  ",
+        " other   line"
+    ]
+    diffLinesWithVisisbleSpaces = [
+        "--- integrationTests/visible-spaces/test/spaces/build/MyApp/file-with-spaces",
+        "+++ integrationTests/visible-spaces/test/spaces/expected-file-with-spaces",
+        "@@ -1,3 +1,3 @@",
+        "•line•with•spaces",
+        "-foo•is•bar",
+        "+•foo••is••bar••",
+        "•other•••line"
+    ]
+    diffMock.return_value = diffLines
+    styleMock.side_effect = styleSideEffect
+
+    fileMatchesRule = FileMatchesRule({VISIBLE_WHITESPACE: True}, testFolder, fileName, fixturePath)
+    fileMatchesRule.printDifferences(fileName, fixturePath)
+
+    diffMock.assert_called_once_with(wrongOutputLines, fixtureFileLines, fromfile=fileName, tofile=fixturePath)
+    echoMock.assert_any_call("ANSI STYLED yellow:: "+diffLinesWithVisisbleSpaces[0])
+    echoMock.assert_any_call("ANSI STYLED blue:: "+diffLinesWithVisisbleSpaces[1])
+    echoMock.assert_any_call(diffLinesWithVisisbleSpaces[2])
+    echoMock.assert_any_call(diffLinesWithVisisbleSpaces[3])
+    echoMock.assert_any_call("ANSI STYLED yellow:: "+diffLinesWithVisisbleSpaces[4])
+    echoMock.assert_any_call("ANSI STYLED blue:: "+diffLinesWithVisisbleSpaces[5])
+    echoMock.assert_any_call(diffLinesWithVisisbleSpaces[6])
