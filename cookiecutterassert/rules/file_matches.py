@@ -92,6 +92,9 @@ class FileMatchesRule:
     
     def getVisibleWhitespace(self, diffLine):
         if (VISIBLE_WHITESPACE in self.options and self.options[VISIBLE_WHITESPACE]):
-            return diffLine.replace(" ", "•")
+            first_char = diffLine[0:1]
+            diff_body = diffLine[1:]
+            updated_body = diff_body.replace(" ", "•").replace("\t","→")
+            return first_char + updated_body
         else:
             return diffLine

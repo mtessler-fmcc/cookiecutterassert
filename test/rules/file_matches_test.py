@@ -188,17 +188,21 @@ def test_printDifferencesPrintsFileDiffWithVisibleWhitepsace(echoMock, styleMock
         "@@ -1,3 +1,3 @@",
         " line with spaces",
         "-foo is bar",
+        "-foo	is	bar",
         "+ foo  is  bar  ",
+        "+	foo		is	bar	",
         " other   line"
     ]
     diffLinesWithVisisbleSpaces = [
         "--- integrationTests/visible-spaces/test/spaces/build/MyApp/file-with-spaces",
         "+++ integrationTests/visible-spaces/test/spaces/expected-file-with-spaces",
         "@@ -1,3 +1,3 @@",
-        "•line•with•spaces",
+        " line•with•spaces",
         "-foo•is•bar",
+        "-foo→is→bar",
         "+•foo••is••bar••",
-        "•other•••line"
+        "+→foo→→is→bar→",
+        " other•••line"
     ]
     diffMock.return_value = diffLines
     styleMock.side_effect = styleSideEffect
@@ -212,5 +216,7 @@ def test_printDifferencesPrintsFileDiffWithVisibleWhitepsace(echoMock, styleMock
     echoMock.assert_any_call(diffLinesWithVisisbleSpaces[2])
     echoMock.assert_any_call(diffLinesWithVisisbleSpaces[3])
     echoMock.assert_any_call("ANSI STYLED yellow:: "+diffLinesWithVisisbleSpaces[4])
-    echoMock.assert_any_call("ANSI STYLED blue:: "+diffLinesWithVisisbleSpaces[5])
-    echoMock.assert_any_call(diffLinesWithVisisbleSpaces[6])
+    echoMock.assert_any_call("ANSI STYLED yellow:: "+diffLinesWithVisisbleSpaces[5])
+    echoMock.assert_any_call("ANSI STYLED blue:: "+diffLinesWithVisisbleSpaces[6])
+    echoMock.assert_any_call("ANSI STYLED blue:: "+diffLinesWithVisisbleSpaces[7])
+    echoMock.assert_any_call(diffLinesWithVisisbleSpaces[8])
